@@ -9,6 +9,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.format.DateFormat;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -16,7 +17,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -44,7 +44,7 @@ public class TasksActivity extends AppCompatActivity {
         setContentView(R.layout.activity_tasks);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        toolbar.setTitle("TODo List");
+        toolbar.setTitle("ToDo List");
         setSupportActionBar(toolbar);
 
         // Variables
@@ -126,6 +126,7 @@ public class TasksActivity extends AppCompatActivity {
             CheckBox doneCheckBox = (CheckBox) convertView.findViewById(R.id.row_task_list_cb_done);
 
             taskTextView.setText(((Task) getItem(position)).getName());
+            doneCheckBox.setChecked(((Task) getItem(position)).isDone());
 
             SimpleDateFormat sdf = new SimpleDateFormat(App.DATE_FORMAT);
             Date date = ((Task) getItem(position)).getDate();
@@ -135,7 +136,11 @@ public class TasksActivity extends AppCompatActivity {
                 dateTextView.setText("Yesterday");
             else if (sdf.format(date).equals(sdf.format(getDate(1))))
                 dateTextView.setText("Tomorrow");
-            else
+            else if (date.getTime() < getDate(6).getTime()) {
+                Calendar calendar = Calendar.getInstance();
+                calendar.setTime(date);
+                dateTextView.setText(DateFormat.format("EEEE", calendar.getTime()).toString());
+            } else
                 dateTextView.setText(sdf.format(((Task) getItem(position)).getDate()));
 
             convertView.findViewById(R.id.row_task_list_ll_detail).setOnClickListener(new View.OnClickListener() {
@@ -147,10 +152,16 @@ public class TasksActivity extends AppCompatActivity {
                 }
             });
 
-            doneCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+
+            doneCheckBox.setOnClickListener(new View.OnClickListener() {
                 @Override
-                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                    app.getTask(position).setDone(isChecked);
+                public void onClick(View v) {
+                    Task task = new Task();
+                    task.setId(app.getTask(position).getId());
+                    task.setDate(app.getTask(position).getDate());
+                    task.setName(app.getTask(position).getName());
+                    task.setDone(((CheckBox) v).isChecked());
+                    app.updateTask(position, task);
                 }
             });
             deleteImageView.setOnClickListener(new View.OnClickListener() {

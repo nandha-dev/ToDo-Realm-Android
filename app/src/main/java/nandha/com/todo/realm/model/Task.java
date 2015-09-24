@@ -2,26 +2,27 @@ package nandha.com.todo.realm.model;
 
 import java.util.Date;
 
+import io.realm.RealmObject;
 import io.realm.annotations.PrimaryKey;
 
 /**
  * Created by nandha on 22/09/15.
  */
-public class Task {
+public class Task extends RealmObject {
 
     @PrimaryKey
-    private long id;
+    private String id;
 
     private String name;
     private Date date;
 
     private boolean done;
 
-    public long getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(String id) {
         this.id = id;
     }
 

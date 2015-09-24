@@ -100,6 +100,7 @@ public class AddTaskActivity extends AppCompatActivity {
             mTaskDateEditText.setError("Not a correct date");
             return;
         }
+        task.setDone(false);
         app.addTask(task);
         setResult(RESULT_OK);
         finish();
@@ -121,6 +122,7 @@ public class AddTaskActivity extends AppCompatActivity {
             mTaskDateEditText.setError("Not a correct date");
             return;
         }
+        task.setId(app.getTask(position).getId());
         app.updateTask(position, task);
         setResult(RESULT_OK);
         finish();
