@@ -22,9 +22,8 @@ public class AddTaskActivity extends AppCompatActivity {
 
     // Variables
     private Context mContext;
+    private App app;
 
-    // Views
-    private Button mAddButton;
     private EditText mTaskNameEditText;
     private EditText mTaskDateEditText;
 
@@ -41,10 +40,11 @@ public class AddTaskActivity extends AppCompatActivity {
 
         // Variables
         mContext = this;
+        app = App.getInstance();
         final int position = getIntent().getIntExtra(App.INTENT_KEY_POSITION, -1);
 
         // Views
-        mAddButton = (Button) findViewById(R.id.activity_add_task_bt_add);
+        Button mAddButton = (Button) findViewById(R.id.activity_add_task_bt_add);
         mTaskNameEditText = (EditText) findViewById(R.id.activity_add_task_et_name);
         mTaskDateEditText = (EditText) findViewById(R.id.activity_add_task_et_date);
 
@@ -73,14 +73,14 @@ public class AddTaskActivity extends AppCompatActivity {
         });
 
         if (position != -1) {
-            fillTask(App.tasks.get(position));
+            fillTask(app.getTask(position));
             mAddButton.setText("EDIT");
         }
     }
 
     private void fillTask(Task task) {
         mTaskNameEditText.setText(task.getName());
-        SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yy");
+        SimpleDateFormat sdf = new SimpleDateFormat(App.DATE_FORMAT);
         mTaskDateEditText.setText(sdf.format(task.getDate()));
     }
 
@@ -100,7 +100,7 @@ public class AddTaskActivity extends AppCompatActivity {
             mTaskDateEditText.setError("Not a correct date");
             return;
         }
-        App.tasks.add(task);
+        app.addTask(task);
         setResult(RESULT_OK);
         finish();
     }
@@ -121,7 +121,7 @@ public class AddTaskActivity extends AppCompatActivity {
             mTaskDateEditText.setError("Not a correct date");
             return;
         }
-        App.tasks.set(position, task);
+        app.updateTask(position, task);
         setResult(RESULT_OK);
         finish();
     }

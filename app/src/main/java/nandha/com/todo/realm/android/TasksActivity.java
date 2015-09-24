@@ -23,8 +23,6 @@ import android.widget.TextView;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 
 import nandha.com.todo.realm.R;
@@ -34,14 +32,11 @@ public class TasksActivity extends AppCompatActivity {
 
     // Variables
     private Context mContext;
+    private App app;
     private static final int ADD_TASK_REQUEST_CODE = 1000;
     private static final int EDIT_TASK_REQUEST_CODE = 1001;
 
-    // Views
-    private FloatingActionButton addFloatingActionButton;
-    private ListView taskListView;
-    private TaskAdapter taskAdapter;
-
+    private TaskAdapter mTaskAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,15 +49,15 @@ public class TasksActivity extends AppCompatActivity {
 
         // Variables
         mContext = this;
+        app = App.getInstance();
 
         // Views
-        addFloatingActionButton = (FloatingActionButton) findViewById(R.id.activity_tasks_fab_add);
-        taskListView = (ListView) findViewById(R.id.activity_tasks_ll_task);
+        FloatingActionButton addFloatingActionButton = (FloatingActionButton) findViewById(R.id.activity_tasks_fab_add);
+        ListView taskListView = (ListView) findViewById(R.id.activity_tasks_ll_task);
 
         // List view adapter
-        taskAdapter = new TaskAdapter(mContext);
-        Collections.sort(App.tasks, new TaskCompare());
-        taskListView.setAdapter(taskAdapter);
+        mTaskAdapter = new TaskAdapter(mContext);
+        taskListView.setAdapter(mTaskAdapter);
 
         //Listeners
         addFloatingActionButton.setOnClickListener(new View.OnClickListener() {
@@ -79,20 +74,18 @@ public class TasksActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == ADD_TASK_REQUEST_CODE && resultCode == RESULT_OK) {
-            Collections.sort(App.tasks, new TaskCompare());
-            taskAdapter.notifyDataSetChanged();
+            mTaskAdapter.notifyDataSetChanged();
             Snackbar.make(findViewById(R.id.rootLayout), "New Task added", Snackbar.LENGTH_SHORT)
                     .setAction("Undo", new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            App.tasks.remove(App.tasks.size() - 1);
-                            taskAdapter.notifyDataSetChanged();
+                            app.removeTask(app.getTaskCount() - 1);
+                            mTaskAdapter.notifyDataSetChanged();
                         }
                     })
                     .show();
         } else if (requestCode == EDIT_TASK_REQUEST_CODE && resultCode == RESULT_OK) {
-            Collections.sort(App.tasks, new TaskCompare());
-            taskAdapter.notifyDataSetChanged();
+            mTaskAdapter.notifyDataSetChanged();
         }
     }
 
@@ -157,14 +150,14 @@ public class TasksActivity extends AppCompatActivity {
             doneCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 @Override
                 public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                    App.tasks.get(position).setDone(isChecked);
+                    app.getTask(position).setDone(isChecked);
                 }
             });
             deleteImageView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if (App.tasks.get(position).isDone()) {
-                        App.tasks.remove(position);
+                    if (app.getTask(position).isDone()) {
+                        app.removeTask(position);
                         TaskAdapter.this.notifyDataSetChanged();
                         return;
                     }
@@ -174,7 +167,7 @@ public class TasksActivity extends AppCompatActivity {
                     alertDialog.setPositiveButton("YES", new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int which) {
                             dialog.cancel();
-                            App.tasks.remove(position);
+                            app.removeTask(position);
                             TaskAdapter.this.notifyDataSetChanged();
                         }
                     });
@@ -197,19 +190,12 @@ public class TasksActivity extends AppCompatActivity {
 
         @Override
         public Object getItem(int position) {
-            return App.tasks.get(position);
+            return app.getTask(position);
         }
 
         @Override
         public int getCount() {
-            return App.tasks.size();
-        }
-    }
-
-    private class TaskCompare implements Comparator<Task> {
-        @Override
-        public int compare(Task o1, Task o2) {
-            return o1.getDate().compareTo(o2.getDate());
+            return app.getTaskCount();
         }
     }
 }
