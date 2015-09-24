@@ -4,6 +4,7 @@
     android:id="@+id/activity_tasks_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:layout_alignParentRight="false"
     tools:context=".TasksActivity">
 
     <android.support.v7.widget.Toolbar
@@ -31,8 +32,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom|right"
-            android:layout_marginBottom="@dimen/codelab_fab_margin_bottom"
-            android:layout_marginRight="@dimen/codelab_fab_margin_right"
+            android:layout_marginBottom="@dimen/fab_margin_bottom"
+            android:layout_marginRight="@dimen/fab_margin_right"
             android:src="@drawable/ic_plus"
             app:fabSize="normal" />
 
